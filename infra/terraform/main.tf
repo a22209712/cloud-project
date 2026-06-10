@@ -90,7 +90,58 @@ resource "aws_instance" "app" {
   vpc_security_group_ids = [aws_security_group.web.id]
   key_name               = "cloud-project-key"
 
+  iam_instance_profile        = aws_iam_instance_profile.ec2_profile.name
+
   tags = {
     Name = "cloud-project-app"
   }
+}
+
+
+resource "aws_sqs_queue" "messages" {
+  name = "cloud-project-queue"
+
+  visibility_timeout_seconds = 30
+
+  tags = {
+    Name = "cloud-project-queue"
+  }
+}
+
+
+resource "aws_iam_role" "ec2_role" {
+  name = "cloud-project-ec2-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+    }]
+  })
+}
+
+
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "cloud-project-profile"
+  role = aws_iam_role.ec2_role.name
+}
+
+resource "aws_iam_role_policy" "sqs_access" {
+  name = "sqs-access"
+  role = aws_iam_role.ec2_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "sqs:*"
+      ]
+      Resource = aws_sqs_queue.messages.arn
+    }]
+  })
 }

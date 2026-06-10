@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Push Docker Images
 
 on:
   push:
@@ -19,10 +19,18 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Image
+      - name: Build Backend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/cloud-project:latest ./app
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest ./services/backend
 
-      - name: Push Image
+      - name: Push Backend
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/cloud-project:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+
+      - name: Build Worker
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/worker:latest ./services/worker
+
+      - name: Push Worker
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/worker:latest

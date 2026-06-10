@@ -9,3 +9,7 @@ output "instance_public_ip" {
 output "instance_public_dns" {
   value = aws_instance.app.public_dns
 }
+
+output "sqs_queue_url" {
+  value = aws_sqs_queue.messages.id
+}
