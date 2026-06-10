@@ -4,7 +4,38 @@
     <title>Cloud Project</title>
 </head>
 <body>
-    <h1>Cloud Project</h1>
-    <p>Deployed with Terraform + Ansible + Docker + GitHub Actions</p>
+
+<h1>Cloud Project</h1>
+
+<p>Frontend Service Running</p>
+
+<button onclick="checkBackend()">
+    Verificar Backend
+</button>
+
+<p id="result"></p>
+
+<script>
+async function checkBackend() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:5000/api/status"
+        );
+
+        const data = await response.json();
+
+        document.getElementById("result").innerText =
+            "Backend: " + data.status;
+
+    } catch (error) {
+
+        document.getElementById("result").innerText =
+            "Backend indisponível";
+    }
+}
+</script>
+
 </body>
 </html>

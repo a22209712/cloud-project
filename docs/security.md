@@ -1,0 +1,7 @@
+- IAM user used instead of root
+- SSH key authentication
+- Security Group only allows:
+    - 22 SSH
+    - 80 HTTP
+- Secrets stored in GitHub Secrets
+- Terraform state stored remotely
