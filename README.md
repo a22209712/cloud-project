@@ -2,22 +2,24 @@
 
 ## Descrição
 
-Este projeto demonstra a implementação de uma infraestrutura cloud utilizando AWS, Terraform, Ansible, Docker e GitHub Actions.
+Este projeto demonstra a implementação de uma solução Cloud na AWS utilizando Infraestrutura como Código (Terraform), Configuração Automatizada (Ansible), Contentorização (Docker) e Integração/Entrega Contínua (GitHub Actions).
 
-O objetivo é automatizar o provisionamento da infraestrutura, a configuração dos servidores, a criação de imagens Docker e a execução de pipelines de Integração e Entrega Contínua (CI/CD).
+O objetivo é automatizar o provisionamento da infraestrutura, a configuração dos servidores, a criação de imagens Docker e a execução de serviços distribuídos através de filas de mensagens.
 
 ---
 
 ## Tecnologias Utilizadas
 
-- AWS EC2
-- AWS VPC
-- Terraform
-- Ansible
-- Docker
-- Docker Hub
-- GitHub Actions
-- Nginx
+* AWS EC2
+* AWS VPC
+* AWS SQS
+* AWS IAM
+* Terraform
+* Ansible
+* Docker
+* Docker Hub
+* GitHub Actions
+* Python Flask
 
 ---
 
@@ -25,17 +27,39 @@ O objetivo é automatizar o provisionamento da infraestrutura, a configuração 
 
 Fluxo principal do sistema:
 
-Desenvolvedor  
-→ GitHub Repository  
-→ GitHub Actions  
-→ Docker Hub  
-→ AWS EC2  
-→ Container Docker  
-→ Aplicação Web
+Programador
+
+↓
+
+GitHub Repository
+
+↓
+
+GitHub Actions
+
+↓
+
+Docker Hub
+
+↓
+
+AWS EC2
+
+↓
+
+Backend Container
+
+↓
+
+AWS SQS
+
+↓
+
+Worker Container
 
 Mais detalhes disponíveis em:
 
-- [Arquitetura](docs/architecture.md)
+* [Arquitetura](docs/architecture.md)
 
 ---
 
@@ -44,9 +68,16 @@ Mais detalhes disponíveis em:
 ```text
 cloud-project/
 │
-├── app/
-│   ├── Dockerfile
-│   └── index.html
+├── services/
+│   ├── backend/
+│   │   ├── app.py
+│   │   ├── Dockerfile
+│   │   └── requirements.txt
+│   │
+│   └── worker/
+│       ├── worker.py
+│       ├── Dockerfile
+│       └── requirements.txt
 │
 ├── ansible/
 │   ├── inventory.ini
@@ -77,12 +108,14 @@ cloud-project/
 
 A infraestrutura é criada automaticamente através do Terraform e inclui:
 
-- VPC
-- Subnet Pública
-- Internet Gateway
-- Route Table
-- Security Group
-- Instância EC2
+* VPC
+* Subnet Pública
+* Internet Gateway
+* Route Table
+* Security Group
+* Instância EC2
+* IAM Role
+* AWS SQS Queue
 
 Região AWS utilizada:
 
@@ -107,17 +140,21 @@ terraform apply
 ansible-playbook -i inventory.ini install-docker.yml
 ```
 
-### 3. Construir Imagem Docker
+### 3. Construir Imagens Docker
 
-O GitHub Actions cria automaticamente a imagem Docker.
+O GitHub Actions cria automaticamente as imagens Docker do Backend e do Worker.
 
 ### 4. Publicar no Docker Hub
 
-A imagem é enviada automaticamente para o Docker Hub.
+As imagens são enviadas automaticamente para o Docker Hub.
 
-### 5. Executar Aplicação
+### 5. Executar Containers
 
-O container Docker é executado na instância EC2 e disponibiliza a aplicação através da porta 80.
+Os containers Backend e Worker são executados na instância EC2.
+
+### 6. Comunicação Assíncrona
+
+O Backend envia mensagens para a AWS SQS e o Worker consome essas mensagens.
 
 ---
 
@@ -126,8 +163,9 @@ O container Docker é executado na instância EC2 e disponibiliza a aplicação 
 Sempre que existe um push para a branch principal (`main`):
 
 1. O GitHub Actions é iniciado.
-2. A imagem Docker é construída.
-3. A imagem Docker é enviada para o Docker Hub.
+2. A imagem Docker do Backend é construída.
+3. A imagem Docker do Worker é construída.
+4. As imagens são enviadas para o Docker Hub.
 
 Workflow utilizado:
 
@@ -137,25 +175,29 @@ Workflow utilizado:
 
 ---
 
-## Acesso à Aplicação
+## Testes
 
-A aplicação pode ser acedida através do endereço IP público da instância EC2.
+Verificar Backend:
 
-Exemplo:
+```bash
+curl http://localhost:5000/api/status
+```
 
-```text
-http://<EC2_PUBLIC_IP>
+Enviar mensagem para a fila:
+
+```bash
+curl http://localhost:5000/send
 ```
 
 ---
 
 ## Documentação
 
-- [Arquitetura](docs/architecture.md)
-- [Configuração](docs/setup.md)
-- [Deployment](docs/deployment.md)
-- [Segurança](docs/security.md)
-- [Limitações](docs/limitations.md)
+* [Arquitetura](docs/architecture.md)
+* [Configuração](docs/setup.md)
+* [Deployment](docs/deployment.md)
+* [Segurança](docs/security.md)
+* [Limitações](docs/limitations.md)
 
 ---
 
