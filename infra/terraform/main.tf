@@ -90,7 +90,12 @@ resource "aws_instance" "app" {
   vpc_security_group_ids = [aws_security_group.web.id]
   key_name               = "cloud-project-key"
 
-  iam_instance_profile        = aws_iam_instance_profile.ec2_profile.name
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+
+  root_block_device {
+    volume_size = 10
+    volume_type = "gp3"
+  }
 
   tags = {
     Name = "cloud-project-app"
