@@ -72,3 +72,15 @@ O GitHub Actions é responsável por:
 2. O Backend envia uma mensagem para a AWS SQS
 3. O Worker consome a mensagem da fila
 4. O Worker processa a tarefa
+
+
+## Decisões Técnicas
+
+Foram tomadas as seguintes decisões:
+
+- Terraform para Infrastructure as Code
+- Ansible para configuração automática da EC2
+- Docker para isolamento dos serviços
+- GitHub Actions para CI/CD
+- AWS SQS para comunicação assíncrona entre serviços
+- Docker Hub como registo de imagens
