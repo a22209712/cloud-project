@@ -18,4 +18,13 @@ resource "aws_lambda_function" "dr_controller" {
   handler = "index.lambda_handler"
 
   timeout = 30
+
+  environment {
+    variables = {
+      PRIMARY_INSTANCE_ID = var.primary_instance_id
+      STANDBY_INSTANCE_ID = var.standby_instance_id
+      PRIMARY_REGION      = var.primary_region
+      STANDBY_REGION      = var.standby_region
+    }
+  }
 }

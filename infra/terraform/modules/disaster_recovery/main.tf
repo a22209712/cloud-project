@@ -57,3 +57,20 @@ resource "aws_iam_role_policy_attachment" "controller" {
   policy_arn = aws_iam_policy.dr_controller_policy.arn
 }
 
+resource "aws_cloudwatch_event_rule" "dr_check" {
+  name                = "${local.name_prefix}-check"
+  schedule_expression = "rate(5 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "lambda" {
+  rule = aws_cloudwatch_event_rule.dr_check.name
+  arn  = aws_lambda_function.dr_controller.arn
+}
+
+resource "aws_lambda_permission" "eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.dr_controller.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.dr_check.arn
+}
