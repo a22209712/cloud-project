@@ -1,0 +1,35 @@
+name: Failover Drill
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  failover-drill:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::968477812241:role/GitHubActionsTerraform
+          aws-region: eu-west-1
+
+      - name: Stop Primary Instance
+        run: |
+          aws ec2 stop-instances --instance-ids i-002d663960d8c8593
+
+      - name: Wait for automatic failover
+        run: sleep 360
+
+      - name: Check Standby Instance
+        run: |
+          aws ec2 describe-instances \
+          --region eu-central-1 \
+          --instance-ids i-08c8845257e2e25c3
