@@ -1,15 +1,19 @@
 output "vpc_id" {
-  value = aws_vpc.main.id
+  value = module.primary.vpc_id
 }
 
 output "instance_public_ip" {
-  value = aws_instance.app.public_ip
+  value = module.primary.instance_public_ip
 }
 
 output "instance_public_dns" {
-  value = aws_instance.app.public_dns
+  value = module.primary.instance_public_dns
 }
 
 output "sqs_queue_url" {
-  value = aws_sqs_queue.messages.id
+  value = module.primary.queue_url
+}
+
+output "rds_endpoint" {
+  value = module.primary.db_endpoint
 }

@@ -20,3 +20,16 @@ provider "aws" {
     }
   }
 }
+
+provider "aws" {
+  alias  = "standby"
+  region = "eu-central-1"
+
+  default_tags {
+    tags = {
+      Project     = "cloud-project"
+      Environment = "standby"
+      ManagedBy   = "terraform"
+    }
+  }
+}
